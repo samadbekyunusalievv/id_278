@@ -10,8 +10,8 @@ class GuessTheFilmScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
-        resizeToAvoidBottomInset: false,
         body: GuessTheFilmInnerScreen(),
       ),
     );
@@ -103,6 +103,7 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
     focusNodes = List.generate(7, (_) => FocusNode());
     message = 'USE THE SUNGLASSES!';
     errorStates = List.filled(7, false);
+    visibilityStates = List.filled(10, false);
   }
 
   List<String> _generateRandomLetters(int count) {
@@ -305,6 +306,11 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDataInitialized = displayLetters.isNotEmpty &&
+        gridColors.isNotEmpty &&
+        controllers.length == 7 &&
+        focusNodes.length == 7;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -312,155 +318,156 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
           Container(
             color: const Color.fromRGBO(224, 186, 53, 1),
           ),
-          SingleChildScrollView(
-            child: Container(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: ScreenUtil().screenWidth * 0.035,
-                    right: ScreenUtil().screenWidth * 0.074,
-                    top: ScreenUtil().screenHeight * 0.267,
-                    child: Transform.rotate(
-                      angle: pi,
+          if (isDataInitialized)
+            SingleChildScrollView(
+              child: Container(
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      left: ScreenUtil().screenWidth * 0.035,
+                      right: ScreenUtil().screenWidth * 0.074,
+                      top: ScreenUtil().screenHeight * 0.267,
+                      child: Transform.rotate(
+                        angle: pi,
+                        child: Image.asset(
+                          'assets/element1.png',
+                          width: ScreenUtil().screenWidth * 0.95,
+                          height: ScreenUtil().screenHeight * 0.074,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: ScreenUtil().screenWidth * 0.04,
+                      left: ScreenUtil().screenWidth * 0.074,
+                      top: ScreenUtil().screenHeight * 0.3680,
                       child: Image.asset(
                         'assets/element1.png',
                         width: ScreenUtil().screenWidth * 0.95,
                         height: ScreenUtil().screenHeight * 0.074,
                       ),
                     ),
-                  ),
-                  Positioned(
-                    right: ScreenUtil().screenWidth * 0.04,
-                    left: ScreenUtil().screenWidth * 0.074,
-                    top: ScreenUtil().screenHeight * 0.3680,
-                    child: Image.asset(
-                      'assets/element1.png',
-                      width: ScreenUtil().screenWidth * 0.95,
-                      height: ScreenUtil().screenHeight * 0.074,
-                    ),
-                  ),
-                  Positioned(
-                    left: ScreenUtil().screenWidth * 0.03,
-                    right: ScreenUtil().screenWidth * 0.03,
-                    top: ScreenUtil().screenHeight * 0.487,
-                    child: Image.asset(
-                      'assets/element2.png',
-                      width: ScreenUtil().screenWidth * 0.10,
-                      height: ScreenUtil().screenHeight * 0.0525,
-                    ),
-                  ),
-                  Positioned(
-                    top: 108.h,
-                    left: -55.w,
-                    child: Image.asset(
-                      'assets/element4.png',
-                      width: 119.w,
-                      height: 97.67.h,
-                    ),
-                  ),
-                  Positioned(
-                    top: 108.h,
-                    right: -55.w,
-                    child: Image.asset(
-                      'assets/element5.png',
-                      width: 119.w,
-                      height: 97.67.h,
-                    ),
-                  ),
-                  Positioned(
-                    top: 623.h,
-                    left: 279.w,
-                    child: Image.asset(
-                      'assets/element6.png',
-                      width: 143.33.w,
-                      height: 127.78.h,
-                    ),
-                  ),
-                  Positioned(
-                    top: 118.h,
-                    left: 0,
-                    right: 0,
-                    child: Text(
-                      'GUESS THE TITLE \n OF THE FILM',
-                      style: TextStyle(
-                        fontFamily: 'ITC Benguiat Std',
-                        fontWeight: FontWeight.w700,
-                        fontSize: 24.sp,
-                        height: 28.8 / 24,
-                        color: const Color.fromRGBO(0, 0, 0, 1),
+                    Positioned(
+                      left: ScreenUtil().screenWidth * 0.03,
+                      right: ScreenUtil().screenWidth * 0.03,
+                      top: ScreenUtil().screenHeight * 0.487,
+                      child: Image.asset(
+                        'assets/element2.png',
+                        width: ScreenUtil().screenWidth * 0.10,
+                        height: ScreenUtil().screenHeight * 0.0525,
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  Column(
-                    children: [
-                      SizedBox(height: 225.r),
-                      _buildFilmStrip(rowIndex: 0),
-                      SizedBox(height: 39.r),
-                      _buildFilmStrip(rowIndex: 1),
-                      SizedBox(height: 50.r),
-                      _buildInputFields(),
-                      SizedBox(height: 30.r),
-                      Text(
-                        message,
+                    Positioned(
+                      top: 108.h,
+                      left: -55.w,
+                      child: Image.asset(
+                        'assets/element4.png',
+                        width: 119.w,
+                        height: 97.67.h,
+                      ),
+                    ),
+                    Positioned(
+                      top: 108.h,
+                      right: -55.w,
+                      child: Image.asset(
+                        'assets/element5.png',
+                        width: 119.w,
+                        height: 97.67.h,
+                      ),
+                    ),
+                    Positioned(
+                      top: 623.h,
+                      left: 279.w,
+                      child: Image.asset(
+                        'assets/element6.png',
+                        width: 143.33.w,
+                        height: 127.78.h,
+                      ),
+                    ),
+                    Positioned(
+                      top: 118.h,
+                      left: 0,
+                      right: 0,
+                      child: Text(
+                        'GUESS THE TITLE \n OF THE FILM',
                         style: TextStyle(
                           fontFamily: 'ITC Benguiat Std',
                           fontWeight: FontWeight.w700,
-                          fontSize: 14.sp,
-                          height: 16.8 / 14,
-                          color: errorStates.contains(true)
-                              ? const Color.fromRGBO(175, 0, 0, 1)
-                              : Colors.black.withOpacity(0.7),
+                          fontSize: 24.sp,
+                          height: 28.8 / 24,
+                          color: const Color.fromRGBO(0, 0, 0, 1),
                         ),
                         textAlign: TextAlign.center,
                       ),
-                    ],
-                  ),
-                  if (isDragging)
-                    Stack(
-                      children: [
-                        _buildOverlay(),
-                        ..._buildVisibleLetters(),
-                      ],
                     ),
-                  GestureDetector(
-                    onPanStart: (details) {
-                      RenderBox renderBox =
-                          context.findRenderObject() as RenderBox;
-                      Offset localPosition =
-                          renderBox.globalToLocal(details.globalPosition);
-                      _startDragging(localPosition);
-                    },
-                    onPanUpdate: (details) {
-                      RenderBox renderBox =
-                          context.findRenderObject() as RenderBox;
-                      Offset localPosition =
-                          renderBox.globalToLocal(details.globalPosition);
-                      setState(() {
-                        glassesPosition = localPosition - touchOffset;
-                        _updateVisibility(localPosition);
-                      });
-                    },
-                    onPanEnd: (details) {
-                      _endDragging();
-                    },
-                    child: Stack(
+                    Column(
                       children: [
-                        Positioned(
-                          left: glassesPosition.dx,
-                          top: glassesPosition.dy,
-                          child: _build3DGlasses(),
+                        SizedBox(height: 225.r),
+                        _buildFilmStrip(rowIndex: 0),
+                        SizedBox(height: 39.r),
+                        _buildFilmStrip(rowIndex: 1),
+                        SizedBox(height: 50.r),
+                        _buildInputFields(),
+                        SizedBox(height: 30.r),
+                        Text(
+                          message,
+                          style: TextStyle(
+                            fontFamily: 'ITC Benguiat Std',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14.sp,
+                            height: 16.8 / 14,
+                            color: errorStates.contains(true)
+                                ? const Color.fromRGBO(175, 0, 0, 1)
+                                : Colors.black.withOpacity(0.7),
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        _buildDynamicElement3(),
                       ],
                     ),
-                  ),
-                ],
+                    if (isDragging)
+                      Stack(
+                        children: [
+                          _buildOverlay(),
+                          ..._buildVisibleLetters(),
+                        ],
+                      ),
+                    GestureDetector(
+                      onPanStart: (details) {
+                        RenderBox renderBox =
+                            context.findRenderObject() as RenderBox;
+                        Offset localPosition =
+                            renderBox.globalToLocal(details.globalPosition);
+                        _startDragging(localPosition);
+                      },
+                      onPanUpdate: (details) {
+                        RenderBox renderBox =
+                            context.findRenderObject() as RenderBox;
+                        Offset localPosition =
+                            renderBox.globalToLocal(details.globalPosition);
+                        setState(() {
+                          glassesPosition = localPosition - touchOffset;
+                          _updateVisibility(localPosition);
+                        });
+                      },
+                      onPanEnd: (details) {
+                        _endDragging();
+                      },
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            left: glassesPosition.dx,
+                            top: glassesPosition.dy,
+                            child: _build3DGlasses(),
+                          ),
+                          _buildDynamicElement3(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
