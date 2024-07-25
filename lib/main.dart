@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'screens/main_screen.dart';
 import 'screens/onboarding_screen.dart';
+import 'screens/settings_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -19,11 +20,13 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _isFirstTime = true;
+  bool _isPremiumUser = false;
 
   @override
   void initState() {
     super.initState();
     _checkFirstTime();
+    _checkPremiumStatus();
   }
 
   Future<void> _checkFirstTime() async {
@@ -36,6 +39,15 @@ class _MyAppState extends State<MyApp> {
 
     setState(() {
       _isFirstTime = isFirstTime;
+    });
+  }
+
+  Future<void> _checkPremiumStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isPremium = prefs.getBool('isPremiumUser') ?? false;
+
+    setState(() {
+      _isPremiumUser = isPremium;
     });
   }
 
@@ -56,6 +68,7 @@ class _MyAppState extends State<MyApp> {
           routes: {
             '/onboarding': (context) => OnboardingScreen(),
             '/main': (context) => MainScreen(),
+            '/settings': (context) => SettingsScreen(),
           },
         );
       },

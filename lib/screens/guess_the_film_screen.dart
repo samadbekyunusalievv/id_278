@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 
@@ -5,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
+
+import 'premium_screen.dart';
 
 class GuessTheFilmScreen extends StatelessWidget {
   @override
@@ -57,6 +60,8 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
   late Offset defaultPosition;
   late Offset touchOffset;
   bool isDragging = false;
+  Timer? _closeDialogTimer;
+  bool _isPremiumUser = false;
 
   @override
   void initState() {
@@ -64,6 +69,16 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
     defaultPosition = Offset(ScreenUtil().screenWidth * 0.46 - 79.r / 2, 540.r);
     glassesPosition = defaultPosition;
     _loadMovieIndex();
+    _checkPremiumStatus();
+  }
+
+  Future<void> _checkPremiumStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isPremium = prefs.getBool('isPremiumUser') ?? false;
+
+    setState(() {
+      _isPremiumUser = isPremium;
+    });
   }
 
   Future<void> _loadMovieIndex() async {
@@ -87,6 +102,7 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
     for (var node in focusNodes) {
       node.dispose();
     }
+    _closeDialogTimer?.cancel();
     super.dispose();
   }
 
@@ -143,133 +159,11 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
           currentMovieIndex = 0;
         }
         _saveMovieIndex();
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return Dialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-                child: SingleChildScrollView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  child: Container(
-                    width: 335.w,
-                    height: 420.h,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      image: const DecorationImage(
-                        image: AssetImage('assets/next_dialog.png'),
-                        fit: BoxFit.contain,
-                      ),
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: 15.h,
-                        ),
-                        Text(
-                          'CONGRATULATIONS!',
-                          style: TextStyle(
-                            fontFamily: 'SF Pro Rounded',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 24.r,
-                            height: 28.64 / 24,
-                            color: const Color(0xFF000000),
-                            letterSpacing: 0.27,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 206.h),
-                        Text(
-                          'YOU GUESSED THE FILM...',
-                          style: TextStyle(
-                            fontFamily: 'SF Pro Rounded',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16.sp,
-                            height: 19.09 / 16,
-                            color: const Color(0xFF000000),
-                            letterSpacing: 0.27,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 10.h),
-                        Text(
-                          selectedMovie.toUpperCase(),
-                          style: TextStyle(
-                            fontFamily: 'ITC Benguiat Std',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 32.r,
-                            height: 38.41 / 32,
-                            letterSpacing: 15.0,
-                            color: const Color(0xFF000000),
-                            shadows: const [
-                              Shadow(
-                                offset: Offset(0, 4),
-                                blurRadius: 4,
-                                color: Color.fromRGBO(0, 0, 0, 0.25),
-                              ),
-                            ],
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 30.h),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20.w),
-                          child: Container(
-                            width: 295.w,
-                            height: 48.h,
-                            decoration: BoxDecoration(
-                              color: const Color.fromRGBO(224, 186, 53, 1),
-                              borderRadius: BorderRadius.circular(10.r),
-                              border: Border.all(
-                                  color: const Color(0xFF000000), width: 1),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Color(0xFF000000),
-                                  offset: Offset(2, 2),
-                                  blurRadius: 0,
-                                  spreadRadius: 0,
-                                ),
-                              ],
-                            ),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                setState(() {
-                                  _startNewGame();
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.r),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'Next',
-                                  style: TextStyle(
-                                    fontFamily: 'SF Pro Rounded',
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16.sp,
-                                    height: 1.0,
-                                    color: const Color(0xFF000000),
-                                    letterSpacing: 0.27,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            });
+        if (!_isPremiumUser) {
+          _showPremiumDialog();
+        } else {
+          _showNextDialog();
+        }
       } else {
         setState(() {
           errorStates = List.filled(7, true);
@@ -277,16 +171,305 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
           Vibration.vibrate(duration: 1000);
         });
         Future.delayed(const Duration(seconds: 3), () {
-          setState(() {
-            errorStates = List.filled(7, false);
-            message = "USE THE SUNGLASSES!";
-            for (var controller in controllers) {
-              controller.clear();
-            }
-          });
+          if (mounted) {
+            setState(() {
+              errorStates = List.filled(7, false);
+              message = "USE THE SUNGLASSES!";
+              for (var controller in controllers) {
+                controller.clear();
+              }
+            });
+          }
         });
       }
     }
+  }
+
+  void _showPremiumDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        _closeDialogTimer = Timer(Duration(seconds: 3), () {
+          if (mounted && Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+            _showNextDialog();
+          }
+        });
+
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.r),
+          ),
+          child: Container(
+            width: 335.w,
+            height: 415.37.h,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.r),
+              image: const DecorationImage(
+                image: AssetImage('assets/premium_dialog_bg.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: SingleChildScrollView(
+              physics: NeverScrollableScrollPhysics(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(height: 20.r),
+                  Text(
+                    'ADS FREE',
+                    style: TextStyle(
+                      fontFamily: 'SF Pro Rounded',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 24.r,
+                      height: 28.64 / 24,
+                      color: const Color(0xFF000000),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 140.r),
+                  Text(
+                    'FOR',
+                    style: TextStyle(
+                      fontFamily: 'SF Pro Rounded',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 24.r,
+                      height: 28.64 / 24,
+                      color: const Color(0xFF000000),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 10.h),
+                  Text(
+                    '\$0.49',
+                    style: TextStyle(
+                      fontFamily: 'ITC Benguiat Std',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 36.r,
+                      height: 43.21 / 36,
+                      letterSpacing: 10.0,
+                      color: const Color(0xFF000000),
+                      shadows: const [
+                        Shadow(
+                          offset: Offset(0, 4),
+                          blurRadius: 4,
+                          color: Color.fromRGBO(0, 0, 0, 0.25),
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20.r),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      _closeDialogTimer?.cancel();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PremiumScreen(
+                              onStatusChanged: _checkPremiumStatus),
+                        ),
+                      ).then((_) {
+                        _showNextDialog();
+                      });
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
+                      child: Container(
+                        width: 335.w,
+                        height: 48.h,
+                        decoration: BoxDecoration(
+                          color: const Color.fromRGBO(224, 186, 53, 1),
+                          borderRadius: BorderRadius.circular(10.r),
+                          border: Border.all(
+                            color: const Color.fromRGBO(0, 0, 0, 1),
+                            width: 1,
+                          ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color.fromRGBO(0, 0, 0, 1),
+                              offset: Offset(2, 2),
+                              blurRadius: 0,
+                              spreadRadius: 0,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            'See Details',
+                            style: TextStyle(
+                              fontFamily: 'SF Pro Rounded',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16.sp,
+                              height: 16 / 16,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20.r),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _closeDialogTimer?.cancel();
+                      _showNextDialog();
+                    },
+                    child: Text(
+                      'Restore',
+                      style: TextStyle(
+                        fontFamily: 'SF Pro Rounded',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16.sp,
+                        height: 16 / 16,
+                        color: const Color(0xFF000000),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showNextDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.r),
+          ),
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: Container(
+              width: 335.w,
+              height: 420.h,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                image: const DecorationImage(
+                  image: AssetImage('assets/next_dialog.png'),
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(height: 15.h),
+                  Text(
+                    'CONGRATULATIONS!',
+                    style: TextStyle(
+                      fontFamily: 'SF Pro Rounded',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 24.r,
+                      height: 28.64 / 24,
+                      color: const Color(0xFF000000),
+                      letterSpacing: 0.27,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 206.h),
+                  Text(
+                    'YOU GUESSED THE FILM...',
+                    style: TextStyle(
+                      fontFamily: 'SF Pro Rounded',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16.sp,
+                      height: 19.09 / 16,
+                      color: const Color(0xFF000000),
+                      letterSpacing: 0.27,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 10.h),
+                  Text(
+                    selectedMovie.toUpperCase(),
+                    style: TextStyle(
+                      fontFamily: 'ITC Benguiat Std',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 32.r,
+                      height: 38.41 / 32,
+                      letterSpacing: 15.0,
+                      color: const Color(0xFF000000),
+                      shadows: const [
+                        Shadow(
+                          offset: Offset(0, 4),
+                          blurRadius: 4,
+                          color: Color.fromRGBO(0, 0, 0, 0.25),
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 30.h),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: Container(
+                      width: 295.w,
+                      height: 48.h,
+                      decoration: BoxDecoration(
+                        color: const Color.fromRGBO(224, 186, 53, 1),
+                        borderRadius: BorderRadius.circular(10.r),
+                        border: Border.all(
+                          color: const Color(0xFF000000),
+                          width: 1,
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0xFF000000),
+                            offset: Offset(2, 2),
+                            blurRadius: 0,
+                            spreadRadius: 0,
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          if (mounted) {
+                            setState(() {
+                              _startNewGame();
+                            });
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Next',
+                            style: TextStyle(
+                              fontFamily: 'SF Pro Rounded',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16.sp,
+                              height: 1.0,
+                              color: const Color(0xFF000000),
+                              letterSpacing: 0.27,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _startDragging(Offset localPosition) {
@@ -498,10 +681,10 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
                   fillColor: errorStates[index] ? Colors.red : Colors.white,
                   counterText: "",
                   border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: errorStates[index]
-                              ? Colors.white
-                              : Colors.white)),
+                    borderSide: BorderSide(
+                      color: errorStates[index] ? Colors.white : Colors.white,
+                    ),
+                  ),
                 ),
                 textAlign: TextAlign.center,
                 maxLength: 1,
@@ -517,7 +700,8 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
                 onChanged: (value) {
                   controllers[index].text = value.toUpperCase();
                   controllers[index].selection = TextSelection.fromPosition(
-                      TextPosition(offset: controllers[index].text.length));
+                    TextPosition(offset: controllers[index].text.length),
+                  );
                   if (value.length == 1) {
                     if (index < 6) {
                       focusNodes[index].unfocus();

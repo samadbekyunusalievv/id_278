@@ -56,7 +56,7 @@ class _MainScreenState extends State<MainScreen> {
       extendBody: true,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white.withOpacity(0.2),
+        backgroundColor: Colors.white.withOpacity(0.0),
         elevation: 0,
         flexibleSpace: Container(
           decoration: BoxDecoration(

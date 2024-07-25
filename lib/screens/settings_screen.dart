@@ -1,27 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'premium_screen.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: SettingsInnerScreen(),
-    );
-  }
+  _SettingsScreenState createState() => _SettingsScreenState();
 }
 
-class SettingsInnerScreen extends StatefulWidget {
-  const SettingsInnerScreen({Key? key}) : super(key: key);
-
-  @override
-  _SettingsInnerScreenState createState() => _SettingsInnerScreenState();
-}
-
-class _SettingsInnerScreenState extends State<SettingsInnerScreen> {
+class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = false;
+  bool _isPremiumUser = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPremiumStatus();
+  }
+
+  Future<void> _checkPremiumStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isPremium = prefs.getBool('isPremiumUser') ?? false;
+    setState(() {
+      _isPremiumUser = isPremium;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,50 +73,96 @@ class _SettingsInnerScreenState extends State<SettingsInnerScreen> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 20.h),
-                  Text(
-                    'ADS FREE FOR',
-                    style: TextStyle(
-                      fontFamily: 'SF Pro Rounded',
-                      fontWeight: FontWeight.w500,
-                      fontSize: 20.sp,
-                      height: 23.87 / 20,
-                      color: const Color.fromRGBO(0, 0, 0, 1),
+                  if (!_isPremiumUser) ...[
+                    SizedBox(height: 20.h),
+                    Text(
+                      'ADS FREE FOR',
+                      style: TextStyle(
+                        fontFamily: 'SF Pro Rounded',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 20.sp,
+                        height: 23.87 / 20,
+                        color: const Color.fromRGBO(0, 0, 0, 1),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 10.h),
-                  Text(
-                    '\$0.49',
-                    style: TextStyle(
-                      fontFamily: 'ITC Benguiat Std',
-                      fontWeight: FontWeight.w700,
-                      fontSize: 36.sp,
-                      height: 43.21 / 36,
-                      color: const Color.fromRGBO(0, 0, 0, 1),
-                      letterSpacing: 15.0,
-                      shadows: const [
-                        Shadow(
-                          offset: Offset(0, 2),
-                          blurRadius: 4,
-                          color: Color.fromRGBO(0, 0, 0, 0.25),
+                    SizedBox(height: 10.h),
+                    Text(
+                      '\$0.49',
+                      style: TextStyle(
+                        fontFamily: 'ITC Benguiat Std',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 36.sp,
+                        height: 43.21 / 36,
+                        color: const Color.fromRGBO(0, 0, 0, 1),
+                        letterSpacing: 15.0,
+                        shadows: const [
+                          Shadow(
+                            offset: Offset(0, 2),
+                            blurRadius: 4,
+                            color: Color.fromRGBO(0, 0, 0, 0.25),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 10.h),
+                    GestureDetector(
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PremiumScreen(
+                                  onStatusChanged: _checkPremiumStatus)),
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 48.h,
+                        decoration: BoxDecoration(
+                          color: const Color.fromRGBO(175, 0, 0, 1),
+                          borderRadius: BorderRadius.circular(10.r),
+                          border: Border.all(
+                              color: const Color.fromRGBO(0, 0, 0, 1),
+                              width: 1),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color.fromRGBO(0, 0, 0, 1),
+                              offset: Offset(2, 2),
+                              blurRadius: 0,
+                              spreadRadius: 0,
+                            ),
+                          ],
                         ),
-                      ],
+                        child: Center(
+                          child: Text(
+                            'See Details',
+                            style: TextStyle(
+                              fontFamily: 'SF Pro Rounded',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16.sp,
+                              height: 1.0,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 10.h),
+                  ],
+                  SizedBox(height: 20.h),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => PremiumScreen()),
+                            builder: (context) => PremiumScreen(
+                                onStatusChanged: _checkPremiumStatus)),
                       );
                     },
                     child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
                       width: double.infinity,
-                      height: 48.h,
+                      height: 50.h,
                       decoration: BoxDecoration(
-                        color: const Color.fromRGBO(175, 0, 0, 1),
+                        color: const Color.fromRGBO(224, 186, 53, 1),
                         borderRadius: BorderRadius.circular(10.r),
                         border: Border.all(
                             color: const Color.fromRGBO(0, 0, 0, 1), width: 1),
@@ -125,88 +175,66 @@ class _SettingsInnerScreenState extends State<SettingsInnerScreen> {
                           ),
                         ],
                       ),
-                      child: Center(
-                        child: Text(
-                          'See Details',
-                          style: TextStyle(
-                            fontFamily: 'SF Pro Rounded',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16.sp,
-                            height: 1.0,
-                            color: Colors.white,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Privacy Policy',
+                            style: TextStyle(
+                              fontFamily: 'SF Pro Rounded',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16.sp,
+                              height: 1.0,
+                              color: const Color.fromRGBO(0, 0, 0, 1),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   ),
                   SizedBox(height: 20.h),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w),
-                    width: double.infinity,
-                    height: 50.h,
-                    decoration: BoxDecoration(
-                      color: const Color.fromRGBO(224, 186, 53, 1),
-                      borderRadius: BorderRadius.circular(10.r),
-                      border: Border.all(
-                          color: const Color.fromRGBO(0, 0, 0, 1), width: 1),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color.fromRGBO(0, 0, 0, 1),
-                          offset: Offset(2, 2),
-                          blurRadius: 0,
-                          spreadRadius: 0,
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Privacy Policy',
-                          style: TextStyle(
-                            fontFamily: 'SF Pro Rounded',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16.sp,
-                            height: 1.0,
-                            color: const Color.fromRGBO(0, 0, 0, 1),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PremiumScreen(
+                                onStatusChanged: _checkPremiumStatus)),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
+                      width: double.infinity,
+                      height: 50.h,
+                      decoration: BoxDecoration(
+                        color: const Color.fromRGBO(224, 186, 53, 1),
+                        borderRadius: BorderRadius.circular(10.r),
+                        border: Border.all(
+                            color: const Color.fromRGBO(0, 0, 0, 1), width: 1),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color.fromRGBO(0, 0, 0, 1),
+                            offset: Offset(2, 2),
+                            blurRadius: 0,
+                            spreadRadius: 0,
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 20.h),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w),
-                    width: double.infinity,
-                    height: 50.h,
-                    decoration: BoxDecoration(
-                      color: const Color.fromRGBO(224, 186, 53, 1),
-                      borderRadius: BorderRadius.circular(10.r),
-                      border: Border.all(
-                          color: const Color.fromRGBO(0, 0, 0, 1), width: 1),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color.fromRGBO(0, 0, 0, 1),
-                          offset: Offset(2, 2),
-                          blurRadius: 0,
-                          spreadRadius: 0,
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Terms of Use',
-                          style: TextStyle(
-                            fontFamily: 'SF Pro Rounded',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16.sp,
-                            height: 1.0,
-                            color: const Color.fromRGBO(0, 0, 0, 1),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Terms of Use',
+                            style: TextStyle(
+                              fontFamily: 'SF Pro Rounded',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16.sp,
+                              height: 1.0,
+                              color: const Color.fromRGBO(0, 0, 0, 1),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],
