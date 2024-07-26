@@ -56,22 +56,31 @@ class _MainScreenState extends State<MainScreen> {
       extendBody: true,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white.withOpacity(0.0),
+        backgroundColor: Colors.transparent,
         elevation: 0,
         flexibleSpace: Container(
+          height: kToolbarHeight + MediaQuery.of(context).padding.top,
+          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.25),
-                offset: Offset(0, 4),
-                blurRadius: 4,
-                spreadRadius: 0,
-              ),
-            ],
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(10.r),
               bottomRight: Radius.circular(10.r),
+            ),
+          ),
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              height: 2.h,
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.25),
+                    offset: const Offset(0, 4),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -81,8 +90,7 @@ class _MainScreenState extends State<MainScreen> {
             fontFamily: 'SF Pro Rounded',
             fontWeight: FontWeight.w500,
             fontSize: 20.sp,
-            height: 23.87 / 20,
-            color: Color(0xFF000000),
+            color: const Color(0xFF000000),
           ),
           textAlign: TextAlign.center,
         ),
@@ -92,7 +100,7 @@ class _MainScreenState extends State<MainScreen> {
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Color(0xFFE0BA35),
             ),
           ),
@@ -106,7 +114,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
         child: Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Color(0xFF000000), width: 1),
+            border: Border.all(color: const Color(0xFF000000), width: 1),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(10.r),
               topRight: Radius.circular(10.r),
@@ -116,7 +124,7 @@ class _MainScreenState extends State<MainScreen> {
                 color: Colors.black.withOpacity(0.25),
                 spreadRadius: 0,
                 blurRadius: 4,
-                offset: Offset(0, 4),
+                offset: const Offset(0, 4),
               ),
             ],
           ),

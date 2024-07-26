@@ -159,11 +159,7 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
           currentMovieIndex = 0;
         }
         _saveMovieIndex();
-        if (!_isPremiumUser) {
-          _showPremiumDialog();
-        } else {
-          _showNextDialog();
-        }
+        _showNextDialog();
       } else {
         setState(() {
           errorStates = List.filled(7, true);
@@ -193,7 +189,7 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
         _closeDialogTimer = Timer(Duration(seconds: 3), () {
           if (mounted && Navigator.of(context).canPop()) {
             Navigator.of(context).pop();
-            _showNextDialog();
+            _startNewGame();
           }
         });
 
@@ -270,10 +266,11 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => PremiumScreen(
-                              onStatusChanged: _checkPremiumStatus),
+                            onStatusChanged: _checkPremiumStatus,
+                          ),
                         ),
                       ).then((_) {
-                        _showNextDialog();
+                        _startNewGame();
                       });
                     },
                     child: Padding(
@@ -317,7 +314,7 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
                     onPressed: () {
                       Navigator.of(context).pop();
                       _closeDialogTimer?.cancel();
-                      _showNextDialog();
+                      _startNewGame();
                     },
                     child: Text(
                       'Restore',
@@ -434,10 +431,10 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop();
-                          if (mounted) {
-                            setState(() {
-                              _startNewGame();
-                            });
+                          if (_isPremiumUser) {
+                            _startNewGame();
+                          } else {
+                            _showPremiumDialog();
                           }
                         },
                         style: ElevatedButton.styleFrom(

@@ -26,22 +26,32 @@ class PremiumScreen extends StatelessWidget {
             backgroundColor: Colors.transparent,
             appBar: AppBar(
               automaticallyImplyLeading: false,
-              backgroundColor: Colors.white.withOpacity(0.0),
+              backgroundColor: Colors.transparent,
               elevation: 0,
               flexibleSpace: Container(
+                height: kToolbarHeight + MediaQuery.of(context).padding.top,
+                padding:
+                    EdgeInsets.only(top: MediaQuery.of(context).padding.top),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.25),
-                      offset: const Offset(0, 4),
-                      blurRadius: 4,
-                      spreadRadius: 0,
-                    ),
-                  ],
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(10.r),
                     bottomRight: Radius.circular(10.r),
+                  ),
+                ),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    height: 2.h,
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.25),
+                          offset: Offset(0, 4),
+                          blurRadius: 4,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -51,8 +61,7 @@ class PremiumScreen extends StatelessWidget {
                   fontFamily: 'SF Pro Rounded',
                   fontWeight: FontWeight.w500,
                   fontSize: 20.sp,
-                  height: 23.87 / 20,
-                  color: const Color(0xFF000000),
+                  color: Color(0xFF000000),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -77,8 +86,7 @@ class PremiumScreen extends StatelessWidget {
                         fontFamily: 'ITC Benguiat Std',
                         fontWeight: FontWeight.w700,
                         fontSize: 38.r,
-                        height: 45.61 / 38,
-                        color: const Color(0xFFF2C40F),
+                        color: Color(0xFFF2C40F),
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -95,8 +103,7 @@ class PremiumScreen extends StatelessWidget {
                         fontFamily: 'SF Pro Rounded',
                         fontWeight: FontWeight.w500,
                         fontSize: 24.sp,
-                        height: 28.64 / 24,
-                        color: const Color(0xFF000000),
+                        color: Color(0xFF000000),
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -107,10 +114,9 @@ class PremiumScreen extends StatelessWidget {
                         fontFamily: 'ITC Benguiat Std',
                         fontWeight: FontWeight.w700,
                         fontSize: 40.sp,
-                        height: 48.01 / 40,
-                        color: const Color(0xFF000000),
+                        color: Color(0xFF000000),
                         letterSpacing: 10.0,
-                        shadows: const [
+                        shadows: [
                           Shadow(
                             offset: Offset(0, 4),
                             blurRadius: 4,
@@ -149,13 +155,13 @@ class PremiumScreen extends StatelessWidget {
                         width: 335.w,
                         height: 48.h,
                         decoration: BoxDecoration(
-                          color: const Color.fromRGBO(175, 0, 0, 1),
+                          color: Color.fromRGBO(175, 0, 0, 1),
                           borderRadius: BorderRadius.circular(10.r),
                           border: Border.all(
-                            color: const Color.fromRGBO(0, 0, 0, 1),
+                            color: Color.fromRGBO(0, 0, 0, 1),
                             width: 1,
                           ),
-                          boxShadow: const [
+                          boxShadow: [
                             BoxShadow(
                               color: Color.fromRGBO(0, 0, 0, 1),
                               offset: Offset(2, 2),
@@ -171,7 +177,6 @@ class PremiumScreen extends StatelessWidget {
                               fontFamily: 'SF Pro Rounded',
                               fontWeight: FontWeight.w500,
                               fontSize: 16.sp,
-                              height: 1.0,
                               color: Colors.white,
                             ),
                           ),
@@ -193,9 +198,8 @@ class PremiumScreen extends StatelessWidget {
                             fontFamily: 'SF Pro Rounded',
                             fontWeight: FontWeight.w400,
                             fontSize: 14.sp,
-                            height: 20 / 14,
                             letterSpacing: -0.4,
-                            color: const Color(0xFF000000),
+                            color: Color(0xFF000000),
                           ),
                         ),
                       ),
@@ -230,9 +234,8 @@ class PremiumScreen extends StatelessWidget {
                             fontFamily: 'SF Pro Rounded',
                             fontWeight: FontWeight.w400,
                             fontSize: 14.sp,
-                            height: 20 / 14,
                             letterSpacing: -0.4,
-                            color: const Color(0xFF000000),
+                            color: Color(0xFF000000),
                           ),
                         ),
                       ),
@@ -245,9 +248,8 @@ class PremiumScreen extends StatelessWidget {
                             fontFamily: 'SF Pro Rounded',
                             fontWeight: FontWeight.w400,
                             fontSize: 14.sp,
-                            height: 20 / 14,
                             letterSpacing: -0.4,
-                            color: const Color(0xFF000000),
+                            color: Color(0xFF000000),
                           ),
                         ),
                       ),
