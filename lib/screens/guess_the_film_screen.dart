@@ -338,6 +338,7 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
 
   void _showNextDialog() {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return Dialog(
