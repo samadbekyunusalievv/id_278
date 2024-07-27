@@ -60,7 +60,6 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
   late Offset defaultPosition;
   late Offset touchOffset;
   bool isDragging = false;
-  Timer? _closeDialogTimer;
   bool _isPremiumUser = false;
 
   @override
@@ -102,7 +101,6 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
     for (var node in focusNodes) {
       node.dispose();
     }
-    _closeDialogTimer?.cancel();
     super.dispose();
   }
 
@@ -184,15 +182,8 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
   void _showPremiumDialog() {
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (BuildContext context) {
-        _closeDialogTimer = Timer(Duration(seconds: 3), () {
-          if (mounted && Navigator.of(context).canPop()) {
-            Navigator.of(context).pop();
-            _startNewGame();
-          }
-        });
-
         return Dialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.r),
@@ -209,7 +200,7 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
               ),
             ),
             child: SingleChildScrollView(
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -261,7 +252,6 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).pop();
-                      _closeDialogTimer?.cancel();
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -313,8 +303,6 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      _closeDialogTimer?.cancel();
-                      _startNewGame();
                     },
                     child: Text(
                       'Restore',
@@ -432,9 +420,9 @@ class _GuessTheFilmInnerScreenState extends State<GuessTheFilmInnerScreen> {
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop();
-                          if (_isPremiumUser) {
-                            _startNewGame();
-                          } else {
+
+                          _startNewGame();
+                          if (!_isPremiumUser) {
                             _showPremiumDialog();
                           }
                         },
